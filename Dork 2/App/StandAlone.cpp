@@ -69,13 +69,13 @@ void StandAlone::paintTiles(const orxSTRING mapSection) {
 
 	int baseMapIndex = 0;
 
-	orxU32 propertyCount = orxConfig_GetKeyCounter();
+	orxU32 propertyCount = orxConfig_GetKeyCount();
 
 	for (orxS32 propertyIndex = 1; propertyIndex < propertyCount + 1; propertyIndex++) {
 		orxCHAR property[30]; //good maximum length
 		orxString_Print(property, "MapPart%d", propertyIndex);
 
-		orxU32 listCount = orxConfig_GetListCounter(property);
+		orxU32 listCount = orxConfig_GetListCount(property);
 
 		for (int listIndex = 0; listIndex < listCount; listIndex++) {
 			const orxSTRING tile = orxConfig_GetListString(property, listIndex);
@@ -163,8 +163,7 @@ void orxFASTCALL StandAlone::Update(const orxCLOCK_INFO* clockInfo, void* contex
 			} else {
 				player->despawn();
 				player = currentScene->getPlayerData();
-				explorationScene->loadPlayerData(player);
-				explorationScene->resetWorld();
+				explorationScene->resetWorld(player);
 				shopScene->loadPlayerData(player);
 				armoryScene->loadPlayerData(player);
 			}

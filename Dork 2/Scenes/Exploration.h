@@ -22,20 +22,51 @@
 #ifndef Exploration_h
 #define Exploration_h
 
+#include <list>
+
 #include "Scene.h"
 
 class Exploration : public Scene {
 	orxCAMERA* camera;
-	const orxVECTOR UITextOffset = {-500, 160, 0.9};
+	const orxVECTOR UITextOffset = Scene::createVector(-500, 160, 0.9);
 
-	int enemiesInExistence = 0;
+	std::list<Enemy*> existingEnemies;
 	orxFLOAT timeSinceEnemySpawn = 0;
 
+	/**
+	 * Spawns a new random enemy in a random location (between
+	 * the edge of the player's view and a few hundred pixels outside
+	 * of that)
+	 */
 	void spawnEnemy();
-public:
-	Exploration(Player*, orxCAMERA*);
 
-	void resetWorld();
+	/**
+	 * Tells entities in the scene whether animations
+	 * should be playing
+	 * @param enable whether animations should be enabled
+	 */
+	void enableAnimation(orxBOOL enable);
+public:
+	/**
+	 * Construct new Exploration scene
+	 * @param player current player
+	 * @param cam reference to the camera
+	 */
+	Exploration(Player* player, orxCAMERA* cam);
+
+	virtual void activate();
+
+	/**
+	 * Resets the world state by clearing enemies
+	 * and resetting music and position
+	 * @param player player to load into reset world
+	 */
+	void resetWorld(Player* player);
+
+	/**
+	 * Restarts the music from the beginning
+	 */
+	void resetMusic();
 
 	virtual SceneType update(const orxCLOCK_INFO*);
 	virtual SceneType getSceneType();

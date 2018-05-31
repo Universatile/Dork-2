@@ -4,17 +4,15 @@ build
 *.perspectivev3
 *.mode1v3
 *~
-*~.nib
-*~.xib 
 xcuserdata
 .*
 XCFs
-Version History
 *.o
 Build/
-*.a
 *.layout
 *.workspace
 *.user
 obj
 Version History
+xcshareddata
+liborxd*

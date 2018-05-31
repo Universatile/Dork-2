@@ -7,10 +7,8 @@ Background music (CC-BY 4.0)
 Fight music (CC0)
 * Ville Nousiainen (http://soundcloud.com/mutkanto) (https://freesound.org/people/Xythe/sounds/81392/)
 
-Selector image
-Help images for shop and armory
-Green tick mark
-All other unlisted UI elements
+Ghost sprites
+All unlisted UI elements
 	(CC-BY-NC-SA 4.0)
 * Arc676/Alessandro Vinciguerra
 
@@ -25,17 +23,32 @@ Modifications to original art by Arc676/Alessandro Vinciguerra
 Goblin sprites ("a BSD-style license")
 * Trent Gamblin https://opengameart.org/content/48-animated-old-school-rpg-characters-16x16
 
+Ogre sprites (CC-BY-NC-SA 4.0)
+* Jason Rennie (https://github.com/Universatile)
+
+Imp sprites (CC-BY 3.0; OGA-BY 3.0; GPL 2.0; GPL 3.0)
+* Redshrike (https://opengameart.org/users/redshrike) (https://opengameart.org/content/lpc-imp)
+Modifications to original art by Arc676/Alessandro Vinciguerra
+* Removed excess whitespace in sprite map
+* Rearranged sprites
+
 Cash register sound effect (CC-BY 3.0)
 * GowlerMusic https://freesound.org/people/GowlerMusic/sounds/360453/
 
 Error sound effect (CC-BY 3.0)
 * original_sound https://freesound.org/people/original_sound/sounds/366106/
 
+Selector movement sound effect (CC-BY 3.0)
+* broumbroum https://freesound.org/people/broumbroum/sounds/50561/
+
+Quantity ticking sound effect (CC0)
+* KorgMS2000B https://freesound.org/people/KorgMS2000B/sounds/54405/
+
 tiles_12.png
 * Buch (http://blog-buch.rhcloud.com) (https://opengameart.org/users/buch) (https://opengameart.org/content/orthographic-outdoor-tiles)
 * Enlarged to 32x32 tiles by Arc676/Alessandro Vinciguerra
 
-Forest_tiles.png
+Forest_tiles.png (not all tiles used in game)
 * https://opengameart.org/content/lpc-forest-tiles
 = Grass and flower tiles (CC-BY-SA) =
 * Based on LPC's Grass made by Lanea Zimmerman (Sharm)

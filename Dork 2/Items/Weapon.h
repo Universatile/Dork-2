@@ -28,6 +28,7 @@
 #include "Enums.h"
 
 class Weapon {
+	// static instances of each weapon
 	static Weapon* sword;
 	static Weapon* club;
 	static Weapon* staff;
@@ -37,21 +38,53 @@ class Weapon {
 	static Weapon* spear;
 
 	static Weapon* noWeapon;
+
+	/**
+	 * Copy a weapon
+	 * @return a new Weapon pointer with the same properties
+	 */
 	Weapon* copy();
 
+	// weapon properties
 	double strMod;
 	double defMod;
 	double speedMod;
 	int price;
 	WeaponType weapon;
 public:
+	// all weapons
 	static std::vector<Weapon*> allWeapons;
 	
-	static orxSTRING getWeaponName(WeaponType);
-	static Weapon* copyOf(WeaponType);
-	static EntityType getTypeForWeapon(WeaponType);
+	/**
+	 * Get name of weapon
+	 * @param type the kind of weapon
+	 * @return human readable name for the weapon
+	 */
+	static orxSTRING getWeaponName(WeaponType type);
 
-	Weapon(WeaponType, double, double, double, int);
+	/**
+	 * Get a copy of a weapon
+	 * @param type desired weapon type
+	 * @return copy of weapon with the desired type
+	 */
+	static Weapon* copyOf(WeaponType type);
+
+	/**
+	 * Get entity type associated with a given weapon
+	 * @param type type of weapon
+	 * @return the associated entity type
+	 */
+	static EntityType getTypeForWeapon(WeaponType type);
+
+	/**
+	 * Construct a new weapon
+	 * @param type type of weapon
+	 * @param str strength modifier
+	 * @param def defense modifier
+	 * @param speed speed modifier
+	 * @param price weapon price
+	 */
+	Weapon(WeaponType type, double str, double def, double speed, int price);
 
 	orxSTRING getName();
 	double getStrMod();

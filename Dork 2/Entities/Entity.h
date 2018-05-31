@@ -28,11 +28,13 @@
 
 class Entity {
 protected:
+	// entity data (in world)
 	orxOBJECT* entity;
 	orxVECTOR position;
 
-	int motionSpeed = 60;
+	const int motionSpeed = 60;
 
+	// entity data (in backend)
 	int HP;
 	int speed;
 	int strength;
@@ -42,13 +44,55 @@ protected:
 	Level level = Level(0);
 	EntityType type;
 public:
-	//combat mechanics
-	static orxBOOL dodge(Entity*, Entity*);
-	static int maxDamage(Entity*, Entity*);
-	static int entityAttack(Entity*, Entity*);
+	/**
+	 * Randomly choose whether an entity can dodge another
+	 * based on stats
+	 * @param att attacking entity
+	 * @param blo blocking entity
+	 * @return whether the blocker successfully dodges the attacker
+	 */
+	static orxBOOL dodge(Entity* att, Entity* blo);
 
-	static orxSTRING typeToString(EntityType);
-	static EntityType weaknessForType(EntityType);
+	/**
+	 * Calculate maximum possible damage that can be dealt based
+	 * on entity stats and weapons
+	 * @param att attacking entity
+	 * @param blo blocking entity
+	 * @return maximum damage that can be dealt in one turn
+	 */
+	static int maxDamage(Entity* att, Entity* blo);
+
+	/**
+	 * Apply effects of an attack
+	 * @param att attacking entity
+	 * @param blo blocking entity
+	 * @return damage dealt by attacker
+	 */
+	static int entityAttack(Entity* att, Entity* blo);
+
+	/**
+	 * Get name of entity type
+	 * @param type relevant type
+	 * @return human readable form of entity type
+	 */
+	static orxSTRING typeToString(EntityType type);
+
+	/**
+	 * Get a given entity type's weakness
+	 * @param type relevant type
+	 * @return entity type that is effective against that type
+	 */
+	static EntityType weaknessForType(EntityType type);
+
+	/**
+	 * Attempt to resume the entity's animation
+	 */
+	virtual void resumeAnimation() = 0;
+
+	/**
+	 * Pauses the entity's animation
+	 */
+	virtual void pauseAnimation();
 
 	orxVECTOR getPosition();
 	void setPosition(orxVECTOR);

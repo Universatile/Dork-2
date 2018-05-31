@@ -25,22 +25,54 @@
 #include "orx.h"
 
 class Level {
+	// scale factor for determining level from XP
 	constexpr static const double xpFactor = 0.05;
+
+	// level data
 	int level = 0;
 	int xp = 0;
 public:
-	Level(int);
-	void operator= (const Level&);
+	/**
+	 * Construct new Level object
+	 * @param xp total XP
+	 */
+	Level(int xp);
 
+	/**
+	 * Copy assignment for Level
+	 * @param lv level object to copy
+	 */
+	void operator= (const Level& lv);
+
+	/**
+	 * Calculates level associated with current XP level
+	 * @return level obtained with current amount of XP
+	 */
 	int calculateLevel();
 
 	int getLevel();
 	int getXP();
 	int getTotalXP();
 
-	static int getXPToNextLevel(int);
+	/**
+	 * Calculate XP associated with a given level
+	 * @param lv desired level
+	 * @return XP level required to reach that level
+	 */
+	static int getXPToNextLevel(int lv);
+
+	/**
+	 * Determine XP required to reach next level
+	 * @return XP required for next level
+	 */
 	int getXPToNextLevel();
-	int gainXP(Level);
+
+	/**
+	 * Increases XP level based on Level of a defeated enemy
+	 * @param lv enemy level
+	 * @return number of levels gained
+	 */
+	int gainXP(Level lv);
 };
 
 #endif

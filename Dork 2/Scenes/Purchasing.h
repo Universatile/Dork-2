@@ -25,24 +25,41 @@
 #include "Scene.h"
 #include "StatViewer.h"
 
+// return values for makePurchase()
 #define PURCHASE_SUCCESSFUL 0
 #define PURCHASE_FAILED 1
 
 class Purchasing : public Scene {
 protected:
+	// player selection
 	int currentSelection = 0;
+	int prevSel = 0;
 	int selectionLimit;
-	orxOBJECT* selectorArrow;
-	orxVECTOR defaultPos;
+	orxBOOL exitSelected = orxFALSE;
+	std::vector<orxOBJECT*> items;
 
+	// UI
+	orxOBJECT* itemSelector;
+	orxOBJECT* exitArrow;
+
+	/**
+	 * Purchase the selected item
+	 * @return the result of the purchase attempt
+	 */
 	virtual int makePurchase() = 0;
-	virtual void loadItemData() = 0;
+
+	/**
+	 * Loads the stats of the selected item
+	 * and updates UI accordingly
+	 */
+	virtual void loadItemData();
 
 	StatViewer* statViewer = orxNULL;
 
 	Purchasing();
 public:
 	virtual void activate();
+	virtual void loadPlayerData(Player*);
 
 	virtual SceneType update(const orxCLOCK_INFO*);
 };

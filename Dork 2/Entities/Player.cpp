@@ -20,6 +20,7 @@
 //See README and LICENSE for more details
 
 #include "Player.h"
+#include "Scene.h"
 
 Player::Player(orxSTRING name, EntityType type) : name(name) {
 	this->type = type;
@@ -31,7 +32,7 @@ Player::Player(orxSTRING name, EntityType type) : name(name) {
 	orxInput_Load(orxSTRING_EMPTY);
 	entity = orxObject_CreateFromConfig("Player");
 
-	position = {1632, 1792, 0};
+	position = Scene::createVector(1632, 1792, 0);
 	orxObject_SetPosition(entity, &position);
 
 	ownedPotions = std::vector<int>(POTIONCOUNT);
@@ -103,7 +104,6 @@ orxSTATUS Player::read(orxSTRING filename) {
 		orxConfig_Load(orxFile_GetApplicationSaveDirectory(path));
 	}
 	if (orxConfig_HasSection("PlayerData") && orxConfig_PushSection("PlayerData")) {
-		motionSpeed = orxConfig_GetU32("MotionSpeed");
 		HP = orxConfig_GetU32("HP");
 		speed = orxConfig_GetU32("Speed");
 		strength = orxConfig_GetU32("Str");
@@ -143,11 +143,9 @@ orxSTATUS Player::write() {
 
 		const orxSTRING potions[POTIONCOUNT];
 		for (int i = 0; i < POTIONCOUNT; i++) {
-			potions[i] = (orxCHAR*)malloc(5 * sizeof(orxCHAR));
-			orxCHAR* str = (orxCHAR*)malloc(5 * sizeof(orxCHAR));
+			orxCHAR str[5];
 			orxString_Print(str, "%d", ownedPotions[i]);
-			memcpy(&potions[i], &str, 5);
-			free(str);
+			potions[i] = str;
 		}
 		orxConfig_SetListString("OwnedPotions", potions, POTIONCOUNT);
 
@@ -168,3 +166,5 @@ orxSTATUS Player::write() {
 orxBOOL Player::sectionFilter(const orxSTRING _zSectionName, const orxSTRING _zKeyName, const orxSTRING _zFileName, orxBOOL _bUseEncryption) {
 	return orxString_Compare(_zSectionName, "PlayerData") == 0;
 }
+
+void Player::resumeAnimation() {}

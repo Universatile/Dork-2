@@ -9,8 +9,13 @@
 /* Begin PBXBuildFile section */
 		711189021FDAC93700344EC8 /* error.wav in CopyFiles */ = {isa = PBXBuildFile; fileRef = 711189011FDAC92D00344EC8 /* error.wav */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		711189041FDBF0F600344EC8 /* tiles_12.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 711189031FDBF0E500344EC8 /* tiles_12.png */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		712467F32045576D0089969C /* OgreSpriteMap.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 712467F2204557640089969C /* OgreSpriteMap.png */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		712467F4204558FE0089969C /* liborx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 715FF6A71FBEDFE7005B1ED4 /* liborx.dylib */; };
 		712CA3951FD77F240063E22E /* PauseMenu.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 712CA3941FD77E230063E22E /* PauseMenu.png */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		712CA3971FD785450063E22E /* Tick.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 712CA3961FD7853C0063E22E /* Tick.png */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		7138B039206114D8001E8DA5 /* ImpSpriteMap.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7138B038206114D0001E8DA5 /* ImpSpriteMap.png */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		7138B03C2061165F001E8DA5 /* selectorMoved.wav in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7138B03A20611656001E8DA5 /* selectorMoved.wav */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		7138B03D20611662001E8DA5 /* tick.wav in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7138B03B20611656001E8DA5 /* tick.wav */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7159CD2A1FD0E7410015482A /* Purchasing.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7159CD281FD0E7410015482A /* Purchasing.cpp */; };
 		7159CD2E1FD24EFA0015482A /* kaching.wav in CopyFiles */ = {isa = PBXBuildFile; fileRef = 71620F471FCADC5D00EBD228 /* kaching.wav */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7159CD2F1FD24EFA0015482A /* Background.ogg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 716CC8351FC6EF1400197944 /* Background.ogg */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
@@ -42,7 +47,6 @@
 		7159CD4F1FD3B0BD0015482A /* MainMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7159CD4D1FD3B0BD0015482A /* MainMenu.cpp */; };
 		7159CD511FD3B94F0015482A /* MainMenu.ini in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7159CD501FD3B93B0015482A /* MainMenu.ini */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7159CD541FD3BBF40015482A /* Arrows.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7159CD531FD3BBEE0015482A /* Arrows.png */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		7159CD551FD3BBF80015482A /* MMSelector.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7159CD521FD3BBEE0015482A /* MMSelector.png */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		7159CD571FD411C30015482A /* Scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7159CD561FD411C30015482A /* Scene.cpp */; };
 		715FF6AF1FBEE1A5005B1ED4 /* StandAlone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715FF5D71FBEDE44005B1ED4 /* StandAlone.cpp */; };
 		715FF6B11FBEE205005B1ED4 /* Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715FF6B01FBEE205005B1ED4 /* Main.cpp */; };
@@ -77,7 +81,6 @@
 		71C480A1202A96AB00AE8470 /* Level.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71C4809F202A96AB00AE8470 /* Level.cpp */; };
 		71E96C49202D308D001BE088 /* GhostSpriteMap.png in CopyFiles */ = {isa = PBXBuildFile; fileRef = 71E96C48202D3085001BE088 /* GhostSpriteMap.png */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		71F208361FC3FA190001AB3F /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71F208341FC3FA190001AB3F /* Player.cpp */; };
-		71F921B81FC59B1D0037725A /* liborx.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 715FF6A71FBEDFE7005B1ED4 /* liborx.dylib */; };
 		71FBC3231FD021FB00F9E1B1 /* StatViewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FBC3211FD021FB00F9E1B1 /* StatViewer.cpp */; };
 /* End PBXBuildFile section */
 
@@ -98,6 +101,8 @@
 				71959C391FD97DED00AF6DAF /* Sickle.png in CopyFiles */,
 				7159CD401FD24F1E0015482A /* GoblinSpriteMap.png in CopyFiles */,
 				71E96C49202D308D001BE088 /* GhostSpriteMap.png in CopyFiles */,
+				7138B039206114D8001E8DA5 /* ImpSpriteMap.png in CopyFiles */,
+				712467F32045576D0089969C /* OgreSpriteMap.png in CopyFiles */,
 				7159CD411FD24F1E0015482A /* ShopHelp.png in CopyFiles */,
 				71959C421FD982BB00AF6DAF /* qh2.png in CopyFiles */,
 				71959C431FD982BE00AF6DAF /* qh5.png in CopyFiles */,
@@ -114,7 +119,6 @@
 				711189041FDBF0F600344EC8 /* tiles_12.png in CopyFiles */,
 				7159CD541FD3BBF40015482A /* Arrows.png in CopyFiles */,
 				712CA3951FD77F240063E22E /* PauseMenu.png in CopyFiles */,
-				7159CD551FD3BBF80015482A /* MMSelector.png in CopyFiles */,
 				718914431FD6DAED00D48C37 /* LoadPlayer.png in CopyFiles */,
 				718914441FD6DAF000D48C37 /* NewPlayer.png in CopyFiles */,
 				712CA3971FD785450063E22E /* Tick.png in CopyFiles */,
@@ -143,6 +147,8 @@
 				7159CD2F1FD24EFA0015482A /* Background.ogg in CopyFiles */,
 				711189021FDAC93700344EC8 /* error.wav in CopyFiles */,
 				71BFEEA8201238E500D26A59 /* fight.wav in CopyFiles */,
+				7138B03D20611662001E8DA5 /* tick.wav in CopyFiles */,
+				7138B03C2061165F001E8DA5 /* selectorMoved.wav in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,8 +157,12 @@
 /* Begin PBXFileReference section */
 		711189011FDAC92D00344EC8 /* error.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = error.wav; sourceTree = "<group>"; };
 		711189031FDBF0E500344EC8 /* tiles_12.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tiles_12.png; sourceTree = "<group>"; };
+		712467F2204557640089969C /* OgreSpriteMap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = OgreSpriteMap.png; sourceTree = "<group>"; };
 		712CA3941FD77E230063E22E /* PauseMenu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PauseMenu.png; sourceTree = "<group>"; };
 		712CA3961FD7853C0063E22E /* Tick.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Tick.png; sourceTree = "<group>"; };
+		7138B038206114D0001E8DA5 /* ImpSpriteMap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ImpSpriteMap.png; sourceTree = "<group>"; };
+		7138B03A20611656001E8DA5 /* selectorMoved.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = selectorMoved.wav; sourceTree = "<group>"; };
+		7138B03B20611656001E8DA5 /* tick.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = tick.wav; sourceTree = "<group>"; };
 		7159CD281FD0E7410015482A /* Purchasing.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Purchasing.cpp; sourceTree = "<group>"; };
 		7159CD291FD0E7410015482A /* Purchasing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Purchasing.h; sourceTree = "<group>"; };
 		7159CD2B1FD24ECF0015482A /* ArmoryHelp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ArmoryHelp.png; sourceTree = "<group>"; };
@@ -164,7 +174,6 @@
 		7159CD4D1FD3B0BD0015482A /* MainMenu.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MainMenu.cpp; sourceTree = "<group>"; };
 		7159CD4E1FD3B0BD0015482A /* MainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainMenu.h; sourceTree = "<group>"; };
 		7159CD501FD3B93B0015482A /* MainMenu.ini */ = {isa = PBXFileReference; lastKnownFileType = text; path = MainMenu.ini; sourceTree = "<group>"; };
-		7159CD521FD3BBEE0015482A /* MMSelector.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MMSelector.png; sourceTree = "<group>"; };
 		7159CD531FD3BBEE0015482A /* Arrows.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Arrows.png; sourceTree = "<group>"; };
 		7159CD561FD411C30015482A /* Scene.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Scene.cpp; sourceTree = "<group>"; };
 		715FF5D41FBEDE44005B1ED4 /* Dork 2 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Dork 2"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -328,7 +337,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71F921B81FC59B1D0037725A /* liborx.dylib in Frameworks */,
+				712467F4204558FE0089969C /* liborx.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -654,6 +663,8 @@
 		716CC8341FC6EF1400197944 /* Music */ = {
 			isa = PBXGroup;
 			children = (
+				7138B03A20611656001E8DA5 /* selectorMoved.wav */,
+				7138B03B20611656001E8DA5 /* tick.wav */,
 				71BFEEA7201238CB00D26A59 /* fight.wav */,
 				711189011FDAC92D00344EC8 /* error.wav */,
 				71620F471FCADC5D00EBD228 /* kaching.wav */,
@@ -732,10 +743,11 @@
 				718914411FD6DA3D00D48C37 /* LoadPlayer.png */,
 				718914421FD6DA3D00D48C37 /* NewPlayer.png */,
 				7159CD531FD3BBEE0015482A /* Arrows.png */,
-				7159CD521FD3BBEE0015482A /* MMSelector.png */,
 				7159CD2B1FD24ECF0015482A /* ArmoryHelp.png */,
 				71620F211FC823DF00EBD228 /* GoblinSpriteMap.png */,
 				71E96C48202D3085001BE088 /* GhostSpriteMap.png */,
+				712467F2204557640089969C /* OgreSpriteMap.png */,
+				7138B038206114D0001E8DA5 /* ImpSpriteMap.png */,
 				71620F1F1FC81CBB00EBD228 /* ShopHelp.png */,
 				71620F1D1FC7BB4C00EBD228 /* Selector.png */,
 				718B57E31FC4440200A457C8 /* MainGuySpriteSheet.png */,
@@ -787,7 +799,7 @@
 		715FF5CC1FBEDE44005B1ED4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0910;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Arc676;
 				TargetAttributes = {
 					715FF5D31FBEDE44005B1ED4 = {
@@ -854,6 +866,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -861,6 +874,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -911,6 +925,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -918,6 +933,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

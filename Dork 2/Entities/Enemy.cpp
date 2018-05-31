@@ -21,6 +21,7 @@
 
 #include "Enemy.h"
 #include "Player.h"
+#include "Scene.h"
 
 const float Enemy::healthBounds[]   = {0.7, 2, 0.5, 0.8, 1.4, 1, 1.7};
 const float Enemy::speeds[]         = {1, 4, 0.5, 1.2, 2, 1.4, 0.3};
@@ -58,30 +59,34 @@ Enemy::Enemy(EnemyType type, int HP, int speed, int str, int def, Weapon* w, int
 
 void Enemy::newRandomDirection() {
 	int dir = orxMath_GetRandomS32(0, 3);
-	orxCHAR anim[30];
 	orxSTRING strDir = (orxSTRING)"";
 	switch (dir) {
 		case 0:
-			direction = {1, 0, 0};
+			direction = Scene::createVector(1, 0, 0);
 			strDir = (orxSTRING)"Right";
 			break;
 		case 1:
-			direction = {0, 1, 0};
+			direction = Scene::createVector(0, 1, 0);
 			strDir = (orxSTRING)"Down";
 			break;
 		case 2:
-			direction = {-1, 0, 0};
+			direction = Scene::createVector(-1, 0, 0);
 			strDir = (orxSTRING)"Left";
 			break;
 		case 3:
-			direction = {0, -1, 0};
+			direction = Scene::createVector(0, -1, 0);
 			strDir = (orxSTRING)"Up";
 			break;
 		default:
 			break;
 	}
-	orxString_Print(anim, "Walk%sAnim%s", strDir, getName());
-	orxObject_SetTargetAnim(entity, anim);
+	orxString_Print(animation, "Walk%sAnim%s", strDir, getName());
+	resumeAnimation();
+	distanceTravelled = 0;
+}
+
+void Enemy::resumeAnimation() {
+	orxObject_SetTargetAnim(entity, animation);
 }
 
 EntityType Enemy::entityTypeForEnemy(EnemyType type) {
@@ -137,14 +142,19 @@ Enemy* Enemy::createRandomEnemy(EnemyType type, Player* player, orxVECTOR pos) {
 void Enemy::update(float dt) {
 	if (distanceTravelled > 100) {
 		newRandomDirection();
-		distanceTravelled = 0;
 	}
 	orxObject_GetPosition(entity, &position);
+	orxFLOAT distance = orxVector_GetDistance(&position, &prevPosition);
+	if (distance < motionSpeed * lastDt * 0.5) {
+		newRandomDirection();
+	}
+	orxVector_Copy(&prevPosition, &position);
 	orxVECTOR movement;
 	orxVector_Mulf(&movement, &direction, motionSpeed * dt);
 	orxVector_Add(&position, &position, &movement);
 	orxObject_SetWorldPosition(entity, &position);
 	distanceTravelled += orxVector_GetSize(&movement);
+	lastDt = dt;
 }
 
 EnemyType Enemy::getEnemyType() {

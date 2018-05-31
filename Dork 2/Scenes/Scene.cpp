@@ -22,6 +22,15 @@
 #include "Scene.h"
 
 orxBOOL Scene::playMusic = orxTRUE;
+const orxVECTOR Scene::textMargin = Scene::createVector(10, 10, 0);
+
+orxVECTOR Scene::createVector(orxFLOAT x, orxFLOAT y, orxFLOAT z) {
+	orxVECTOR vector;
+	vector.fX = x;
+	vector.fY = y;
+	vector.fZ = z;
+	return vector;
+}
 
 Scene::Scene() {
 	pauseSelector = orxObject_CreateFromConfig("Selector");
@@ -132,6 +141,7 @@ SceneType Scene::update(const orxCLOCK_INFO* clockInfo) {
 	if (paused) {
 		orxVECTOR pos;
 		orxObject_GetPosition(pauseSelector, &pos);
+		int prevSelection = pauseMenuSelection;
 		if (getKeyDown((orxSTRING)"GoDown") && pauseMenuSelection < PAUSE_MENU_ITEM_COUNT) {
 			pauseMenuSelection++;
 			pos.fY += 60;
@@ -168,9 +178,6 @@ SceneType Scene::update(const orxCLOCK_INFO* clockInfo) {
 
 					//return to main menu if necessary
 					if (selected == PAUSE_EXIT) {
-						if (music != orxNULL) {
-							orxSound_Stop(music);
-						}
 						return MAIN_MENU;
 					}
 				}
@@ -179,7 +186,10 @@ SceneType Scene::update(const orxCLOCK_INFO* clockInfo) {
 					break;
 			}
 		}
-		orxObject_SetPosition(pauseSelector, &pos);
+		if (pauseMenuSelection != prevSelection) {
+			orxObject_SetPosition(pauseSelector, &pos);
+			orxObject_AddSound(pauseSelector, "SelectorSound");
+		}
 	} else if (hasText) {
 		if (Scene::getKeyDown((orxSTRING)"Enter")) {
 			dismissUIText();

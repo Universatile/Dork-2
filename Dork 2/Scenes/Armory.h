@@ -25,13 +25,23 @@
 #include "Purchasing.h"
 #include "Weapon.h"
 
-#define WEAPON_EQUIPPPED 2
+// additional return values for makePurchase()
+#define WEAPON_EQUIPPED   2
+#define WEAPON_UNEQUIPPED 3
 
 class Armory : public Purchasing {
-	std::vector<orxOBJECT*> tickMarks;
+	// interface stuff for weapons
+	orxOBJECT* tickMark;
 	int lastEquipped = -1;
-	void equipWeapon(WeaponType);
 
+	/**
+	 * Equips the selection weapon for the player
+	 * or unequips the player's weapon
+	 * @param type Weapon type to equip (or NOWEAPON to unequip)
+	 */
+	void equipWeapon(WeaponType type);
+
+	// text fields
 	orxOBJECT* weaponName;
 	orxOBJECT* weaponPrice;
 	orxOBJECT* weaponStr;
@@ -42,7 +52,11 @@ protected:
 	virtual int makePurchase();
 	virtual void loadItemData();
 public:
-	Armory(Player*);
+	/**
+	 * Construct new Armory scene
+	 * @param player current player
+	 */
+	Armory(Player* player);
 
 	virtual void loadPlayerData(Player*);
 	virtual SceneType getSceneType();
