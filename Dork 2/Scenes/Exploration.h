@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 24/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -22,25 +22,52 @@
 #ifndef Exploration_h
 #define Exploration_h
 
+#include <list>
+
 #include "Scene.h"
 
 class Exploration : public Scene {
 	orxCAMERA* camera;
+	const orxVECTOR UITextOffset = Scene::createVector(-500, 160, 0.9);
 
-	int enemiesInExistence = 0;
+	std::list<Enemy*> existingEnemies;
 	orxFLOAT timeSinceEnemySpawn = 0;
 
+	/**
+	 * Spawns a new random enemy in a random location (between
+	 * the edge of the player's view and a few hundred pixels outside
+	 * of that)
+	 */
 	void spawnEnemy();
 
-	SceneType nextSceneType;
+	/**
+	 * Tells entities in the scene whether animations
+	 * should be playing
+	 * @param enable whether animations should be enabled
+	 */
+	void enableAnimation(orxBOOL enable);
 public:
-	Exploration(Player*, orxCAMERA*);
-
-	void resetWorld();
+	/**
+	 * Construct new Exploration scene
+	 * @param player current player
+	 * @param cam reference to the camera
+	 */
+	Exploration(Player* player, orxCAMERA* cam);
 
 	virtual void activate();
-	virtual void deactivate();
-	
+
+	/**
+	 * Resets the world state by clearing enemies
+	 * and resetting music and position
+	 * @param player player to load into reset world
+	 */
+	void resetWorld(Player* player);
+
+	/**
+	 * Restarts the music from the beginning
+	 */
+	void resetMusic();
+
 	virtual SceneType update(const orxCLOCK_INFO*);
 	virtual SceneType getSceneType();
 

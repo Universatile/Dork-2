@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 24/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -26,18 +26,22 @@ Move Combat::moves[2][2] = {
 	{USE_ITEM, RUN}
 };
 
+const orxVECTOR Combat::scaleUp = Scene::createVector(2, 2, 0);
+const orxVECTOR Combat::scaleNormal = Scene::createVector(1, 1, 0);
+
 Combat::Combat(Player* player, Enemy* enemy) : Scene(), enemy(enemy) {
 	loadPlayerData(player);
 	selector = orxObject_CreateFromConfig("Selector");
-	orxVECTOR pos = {-1400, 596, 0};
+	orxVECTOR pos = Scene::createVector(-1400, 596, 0);
 	orxObject_SetPosition(selector, &pos);
 
-	playerStats = new StatViewer(player, {-1500, 270, 0});
-	enemyStats = new StatViewer(enemy, {-1000, 150, 0});
-	//	music = orxSound_CreateFromConfig("FightMusic"); //doesn't exist yet
+	playerStats = new StatViewer(player, Scene::createVector(-1500, 270, 0));
+	enemyStats = new StatViewer(enemy, Scene::createVector(-1000, 150, 0));
+	music = orxSound_CreateFromConfig("FightMusic");
+	memset(modifiers, 0, sizeof(modifiers));
 
 	potionName = orxObject_CreateFromConfig("SV");
-	pos = {-1000, 470, 0};
+	pos = Scene::createVector(-1000, 470, 0);
 	orxObject_SetPosition(potionName, &pos);
 	orxObject_Enable(potionName, orxFALSE);
 
@@ -46,7 +50,7 @@ Combat::Combat(Player* player, Enemy* enemy) : Scene(), enemy(enemy) {
 	orxObject_SetPosition(potionEffect, &pos);
 	orxObject_Enable(potionEffect, orxFALSE);
 
-	pos = {-1060, 480, 0};
+	pos = Scene::createVector(-1060, 480, 0);
 	allPotions = std::vector<orxOBJECT*>(POTIONCOUNT);
 	for (int i = 0; i < POTIONCOUNT; i++) {
 		orxOBJECT* potion = orxObject_CreateFromConfig(Potion::configCodeForType((PotionType)i));
@@ -56,13 +60,17 @@ Combat::Combat(Player* player, Enemy* enemy) : Scene(), enemy(enemy) {
 	}
 
 	orxObject_CreateFromConfig("CombatUI");
-	setPauseMenuPosition({-1150.0, 400.0, 0});
+	setPauseMenuPosition(Scene::createVector(-1150.0, 400.0, 0));
+	initializeUITextAt(Scene::createVector(-1600, 560, -0.1));
 }
 
 void Combat::activate() {
 	playerPos = player->getPosition();
-	player->setPosition({-1200, 450, 0});
-	enemy->setPosition({-1100, 200, 0});
+	player->setPosition(Scene::createVector(-1200, 450, 0));
+	orxObject_SetScale(player->getEntity(), &scaleUp);
+
+	enemy->setPosition(Scene::createVector(-1100, 200, 0));
+	orxObject_SetScale(enemy->getEntity(), &scaleUp);
 
 	orxObject_SetTargetAnim(player->getEntity(), "IdleUAnim");
 	orxCHAR anim[30];
@@ -74,13 +82,13 @@ void Combat::activate() {
 	Scene::activate();
 }
 
-bool Combat::playerHasPotions() {
+orxBOOL Combat::playerHasPotions() {
 	for (int i = 0; i < POTIONCOUNT; i++) {
 		if (player->amountOfPotionOwned((PotionType)i) > 0) {
-			return true;
+			return orxTRUE;
 		}
 	}
-	return false;
+	return orxFALSE;
 }
 
 void Combat::deactivate() {
@@ -89,18 +97,37 @@ void Combat::deactivate() {
 	playerStats->destroy();
 	enemyStats->destroy();
 	player->setPosition(playerPos);
+	orxObject_SetScale(player->getEntity(), &scaleNormal);
+	Scene::destroy();
 	Scene::deactivate();
 }
 
 SceneType Combat::makeMove(Move move) {
+	SceneType toReturn = COMBAT;
+	orxCHAR uiText[200];
 	switch (move) {
 		case RUN:
-			return EXPLORATION;
+			orxString_Print(uiText, "Ran away.");
+			toReturn = EXPLORATION;
+			break;
 		case ATTACK:
 		{
-			player->alterSpeed(modifiers[0]);
-			player->alterStrength(modifiers[1]);
-			player->alterDefense(modifiers[2]);
+			orxBOOL hasMods = orxFALSE;
+			for (int i = 0; i < 3; i++) {
+				if (modifiers[i] != 0) {
+					hasMods = orxTRUE;
+					break;
+				}
+			}
+			orxCHAR mods[100];
+			memset(mods, 0, sizeof(mods));
+			if (hasMods) {
+				player->alterSpeed(modifiers[0]);
+				player->alterStrength(modifiers[1]);
+				player->alterDefense(modifiers[2]);
+				orxString_Print(mods, "Obtained %d speed, %d strength, %d defense for this turn.\n",
+								modifiers[0], modifiers[1], modifiers[2]);
+			}
 
 			Entity* firstAttacker = player;
 			Entity* secondAttacker = enemy;
@@ -109,73 +136,101 @@ SceneType Combat::makeMove(Move move) {
 				secondAttacker = player;
 			}
 
-			Entity::entityAttack(firstAttacker, secondAttacker);
-			if (secondAttacker->getHP() > 0){
-				Entity::entityAttack(secondAttacker, firstAttacker);
+			orxCHAR attacks[100];
+			int dmg = Entity::entityAttack(firstAttacker, secondAttacker);
+			orxString_Print(attacks, "%s dealt %d damage.",
+							firstAttacker->getName(), dmg);
+			if (secondAttacker->getHP() > 0) {
+				dmg = Entity::entityAttack(secondAttacker, firstAttacker);
+				orxString_Print(attacks, "%s\n%s dealt %d damage.",
+								attacks, secondAttacker->getName(), dmg);
 			}
 
-			player->alterSpeed(-modifiers[0]);
-			player->alterStrength(-modifiers[1]);
-			player->alterDefense(-modifiers[2]);
+			if (hasMods) {
+				player->alterSpeed(-modifiers[0]);
+				player->alterStrength(-modifiers[1]);
+				player->alterDefense(-modifiers[2]);
+				memset(modifiers, 0, sizeof(modifiers));
+			}
 			if (specialMoveCooldown > 0) {
 				specialMoveCooldown--;
 			}
+
+			orxString_Print(uiText, "%s%s", mods, attacks);
 		}
 			break;
 		case SPECIAL_MOVE:
+		{
 			if (specialMoveCooldown > 0) {
 				orxObject_AddSound(selector, "ErrorSound");
+				orxString_Print(uiText, "Special move requires %d more turns to cool down.",
+								specialMoveCooldown);
+				loadUIText(uiText);
 				return COMBAT;
 			}
+			int level = player->getLevel().getLevel();
 			switch (player->getType()) {
 				case MAGIC:
 				{
-					int dHP = ceil((player->getLevel() + 5) / 10);
-					int ddef = ceil((player->getLevel() + 5) / 50);
-					player->alterDefense(-ddef);
-					Entity::entityAttack(enemy, player);
-					player->alterDefense(ddef);
+					int dHP = 10 * (level + 1);
+					int dv = 7 * (level + 2);
+					player->alterSpeed(-dv);
 					player->alterHP(dHP);
-					specialMoveCooldown = orxMAX(10, player->getLevel() * 0.06);
+					int dmg = Entity::entityAttack(enemy, player);
+					player->alterSpeed(dv);
+					specialMoveCooldown = orxMAX(6, level);
+					orxString_Print(uiText,
+									"-%d speed until next turn. Healed %d HP.\n%s dealt %d damage.\nCooldown: %d",
+									dv, dHP, enemy->getName(), dmg, specialMoveCooldown);
 				}
 					break;
 				case SPEED:
 				{
-					int dstr = ceil((player->getLevel() + 5) / 50);
-					int ddef = ceil((player->getLevel() + 5) / 60);
-					Entity::entityAttack(enemy, player);
+					int dstr = 2 * (level + 1);
+					int ddef = (level + 2);
+					int dmg = Entity::entityAttack(enemy, player);
 					modifiers[1] += dstr;
 					modifiers[2] -= ddef;
-					specialMoveCooldown = orxMAX(8, player->getLevel() * 0.03);
+					specialMoveCooldown = orxMAX(8, level);
+					orxString_Print(uiText,
+									"+%d strength and -%d defense next turn.\n%s dealt %d damage.\nCooldown: %d",
+									dstr, ddef, enemy->getName(), dmg, specialMoveCooldown);
 				}
 					break;
 				case MELEE:
 				{
-					int ddef = ceil((player->getLevel() + 5) / 50);
-					int dv = ceil((player->getLevel() + 5) / 180);
-					Entity::entityAttack(enemy, player);
+					int ddef = 4 * (level + 1);
+					int dv = 2 * (level + 2);
+					int dmg = Entity::entityAttack(enemy, player);
 					modifiers[0] -= dv;
 					modifiers[2] += ddef;
-					specialMoveCooldown = orxMAX(7, player->getLevel() * 0.02);
+					specialMoveCooldown = orxMAX(7, level);
+					orxString_Print(uiText,
+									"-%d speed and +%d defense next turn.\n%s dealt %d damage.\nCooldown: %d",
+									dv, ddef, enemy->getName(), dmg, specialMoveCooldown);
 				}
 					break;
 				case RANGE:
 				{
-					int dstr = ceil((player->getLevel() + 5) / 40);
-					int dv = ceil((player->getLevel() + 5) / 150);
-					Entity::entityAttack(enemy, player);
+					int dstr = 5 * (level + 1);
+					int dv = 3 * (level + 2);
+					int dmg = Entity::entityAttack(enemy, player);
 					modifiers[0] -= dv;
 					modifiers[1] += dstr;
-					specialMoveCooldown = orxMAX(8, player->getLevel() * 0.03);
+					specialMoveCooldown = orxMAX(8, level);
+					orxString_Print(uiText,
+									"-%d speed and +%d strength next turn.\n%s dealt %d damage.\nCooldown: %d",
+									dv, dstr, enemy->getName(), dmg, specialMoveCooldown);
 				}
 					break;
 				default:
 					break;
 			}
+		}
 			break;
 		case USE_ITEM:
 			if (hasPotions) {
-				isSelectingPotion = true;
+				isSelectingPotion = orxTRUE;
 
 				orxObject_Enable(potionName, orxTRUE);
 				orxObject_Enable(potionEffect, orxTRUE);
@@ -188,85 +243,105 @@ SceneType Combat::makeMove(Move move) {
 				orxObject_AddSound(selector, "ErrorSound");
 			}
 			return COMBAT;
-			break;
 	}
 	if (enemy->getHP() <= 0) {
 		player->defeat(enemy);
-		return EXPLORATION;
+		orxString_Print(uiText, "%s\n%s defeated the %s!",
+						uiText, player->getName(), enemy->getName());
+		toReturn = EXPLORATION;
 	} else if (player->getHP() <= 0) {
-		return MAIN_MENU;
+		orxString_Print(uiText, "%s\n%s died.", uiText, player->getName());
+		toReturn = MAIN_MENU;
 	}
 	playerStats->reloadData();
 	enemyStats->reloadData();
-	return COMBAT;
+	loadUIText(uiText);
+	return toReturn;
 }
 
 void Combat::consumePotions() {
 	Potion* p = Potion::getCopyOf(selectedPotion);
+	orxCHAR text[100];
+	orxCHAR effect[50];
+	double delta;
 	switch (selectedPotion) {
 		case SPEEDBOOST:
-			modifiers[0] += player->getSpeed() * orxMath_Pow(p->getAmount(), desiredQuantity);
+			delta = player->getSpeed() * orxMath_Pow(p->getAmount(), desiredQuantity);
+			modifiers[0] += delta;
+			orxString_Print(effect, "Increased speed by %.2f this turn.", delta);
 			break;
 		case STRBOOST:
-			modifiers[1] += player->getStrength() * orxMath_Pow(p->getAmount(), desiredQuantity);
+			delta = player->getStrength() * orxMath_Pow(p->getAmount(), desiredQuantity);
+			modifiers[1] += delta;
+			orxString_Print(effect, "Increased strength by %.2f this turn.", delta);
 			break;
 		case DEFBOOST:
-			modifiers[2] += player->getDefense() * orxMath_Pow(p->getAmount(), desiredQuantity);
+			delta = player->getDefense() * orxMath_Pow(p->getAmount(), desiredQuantity);
+			modifiers[2] += delta;
+			orxString_Print(effect, "Increased defense by %.2f this turn.", delta);
+			break;
 		case QUICKHEAL_2:
 		case QUICKHEAL_5:
 		case QUICKHEAL_10:
 		case QUICKHEAL_20:
 		case QUICKHEAL_50:
-			player->alterHP(p->getAmount() * desiredQuantity);
+			delta = p->getAmount() * desiredQuantity;
+			player->alterHP(delta);
+			orxString_Print(effect, "Gained %d HP.", (int)delta);
 			break;
 		default:
 			break;
 	}
+	orxString_Print(text, "Used %d vial(s) of %s.\n%s", desiredQuantity, p->getName(), effect);
+	loadUIText(text);
 	player->changePotionAmount(selectedPotion, -desiredQuantity);
 	playerStats->reloadData();
 }
 
 SceneType Combat::update(const orxCLOCK_INFO* clockInfo) {
 	if (isSelectingPotion) {
-		bool switchPotion = false;
+		orxBOOL switchPotion = orxFALSE;
+		int prevQuantity = desiredQuantity;
 		int direction = 1;
 		if (getKeyDown((orxSTRING)"Pause")) {
-			isSelectingPotion = false;
+			isSelectingPotion = orxFALSE;
 		} else if (getKeyDown((orxSTRING)"Enter")) {
 			consumePotions();
 			hasPotions = playerHasPotions();
-			isSelectingPotion = false;
+			isSelectingPotion = orxFALSE;
 			desiredQuantity = 1;
-		} else if (getKeyDown((orxSTRING)"GoDown") &&
+		} else if (getKeyDown((orxSTRING)"QtyDown") &&
 				   desiredQuantity > 1) {
 			desiredQuantity--;
-			updatePotionDescription();
-		} else if (getKeyDown((orxSTRING)"GoUp") &&
+		} else if (getKeyDown((orxSTRING)"QtyUp") &&
 				   desiredQuantity < player->amountOfPotionOwned(selectedPotion)) {
 			desiredQuantity++;
-			updatePotionDescription();
 		} else if (getKeyDown((orxSTRING)"GoLeft")) {
-			switchPotion = true;
+			switchPotion = orxTRUE;
 			direction = -1;
 		} else if (getKeyDown((orxSTRING)"GoRight")) {
-			switchPotion = true;
+			switchPotion = orxTRUE;
 		}
 		if (switchPotion) {
 			desiredQuantity = 1;
 			selectPotion(direction);
 			updatePotionDescription();
-		}
-		if (!isSelectingPotion) {
+			orxObject_AddSound(selector, "SelectorSound");
+		} else if (desiredQuantity != prevQuantity) {
+			updatePotionDescription();
+			orxObject_AddSound(selector, "TickSound");
+		} else if (!isSelectingPotion) {
 			orxObject_Enable(potionName, orxFALSE);
 			orxObject_Enable(potionEffect, orxFALSE);
 			orxObject_Enable(allPotions[selectedPotion], orxFALSE);
 		}
 	} else {
+		orxBOOL hadText = Scene::currentlyHasText();
 		SceneType type = Scene::update(clockInfo);
 		if (type != COMBAT) {
 			return type;
 		}
-		if (paused) {
+		if (paused || hadText) {
 			return COMBAT;
 		}
 		orxVECTOR pos;
@@ -286,15 +361,17 @@ SceneType Combat::update(const orxCLOCK_INFO* clockInfo) {
 			x++;
 		} else {
 			if (getKeyDown((orxSTRING)"Enter")) {
-				return makeMove(moves[y][x]);
+				nextSceneType = makeMove(moves[y][x]);
+				return COMBAT;
 			}
 			selChanged = orxFALSE;
 		}
 		if (selChanged) {
 			orxObject_SetPosition(selector, &pos);
+			orxObject_AddSound(selector, "SelectorSound");
 		}
 	}
-	return COMBAT;
+	return nextSceneType;
 }
 
 void Combat::selectPotion(int direction) {

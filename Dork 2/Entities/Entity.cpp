@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 20/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -20,23 +20,17 @@
 //See README and LICENSE for more details
 
 #include "Entity.h"
-#include "Weapon.h"
 
-int Entity::dodge(Entity* blo, Entity* att) {
-	// defending entity must be faster than attacker
-	if (blo->getSpeed() < att->getSpeed()) {
-		return 0;
+orxBOOL Entity::dodge(Entity* att, Entity* blo) {
+	int attSpeed = att->getSpeed() <= 0 ? 0 : att->getSpeed() * (1 + att->getWeapon()->getSpeedMod());
+	int bloSpeed = blo->getSpeed() <= 0 ? 0 : blo->getSpeed() * (1 + blo->getWeapon()->getSpeedMod());
+	if (orxMath_GetRandomU32(0, attSpeed) < orxMath_GetRandomU32(0, bloSpeed)) {
+		return orxTRUE;
 	}
-	int lim = 2 * (blo->getSpeed() * (1 + blo->getWeapon()->getSpeedMod()));
-	// TODO: this loop is fcking stupid. FIX IT!
-	while (lim > 100) lim *= orxMath_GetRandomFloat(1, 9) / 10;
-	if (orxMath_GetRandomU32(0, 99) < orxMath_GetRandomU32(0, lim)) {
-		return 1;
-	}
-	return 0;
+	return orxFALSE;
 }
 
-int Entity::maxDamage(Entity* attacker, Entity* blocker){
+int Entity::maxDamage(Entity* attacker, Entity* blocker) {
 	// attacks are more or less effective when one entity has a type advantage over the other
 	EntityType bweakness = Entity::weaknessForType(blocker->type);
 	EntityType aweakness = Entity::weaknessForType(attacker->type);
@@ -66,17 +60,16 @@ int Entity::maxDamage(Entity* attacker, Entity* blocker){
 	return str * (1 + attacker->weapon->getStrMod()) - (def * (1 + blocker->weapon->getDefMod()))/4;
 }
 
-int Entity::entityAttack(Entity* attacker, Entity* blocker){
+int Entity::entityAttack(Entity* attacker, Entity* blocker) {
 	int maxDmg = maxDamage(attacker, blocker);
 	if (maxDmg <= 0) {
 		maxDmg = 1;
 	}
-	int damageTaken = orxMath_GetRandomU32(0, maxDmg);
-	if (dodge(blocker, attacker)) {
-		damageTaken = 0;
-	} else {
-		blocker->HP -= damageTaken;
+	if (dodge(attacker, blocker)) {
+		return 0;
 	}
+	int damageTaken = orxMath_GetRandomFloat(0.5, 1) * maxDmg;
+	blocker->HP -= damageTaken;
 	return damageTaken;
 }
 
@@ -108,6 +101,10 @@ orxSTRING Entity::typeToString(EntityType type) {
 		default:
 			return (orxSTRING)"No type";
 	}
+}
+
+void Entity::pauseAnimation() {
+	orxObject_SetTargetAnim(entity, orxNULL);
 }
 
 Weapon* Entity::getWeapon() {
@@ -174,7 +171,7 @@ void Entity::transaction(int delta) {
 	gold += delta;
 }
 
-double Entity::getLevel() {
+Level Entity::getLevel() {
 	return level;
 }
 

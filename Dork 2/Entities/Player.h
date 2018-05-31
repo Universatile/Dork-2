@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 21/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -27,28 +27,85 @@
 #include "Entity.h"
 #include "Enemy.h"
 
+class Scene;
+
 class Player : public Entity {
 	std::vector<int> ownedPotions;
 	std::vector<bool> ownedWeapons;
 	orxSTRING name;
 
+	/**
+	 * Section filter for persistence (see Orx docs)
+	 */
 	static orxBOOL sectionFilter(const orxSTRING, const orxSTRING, const orxSTRING, orxBOOL);
 public:
-	Player(orxSTRING, EntityType);
+	/**
+	 * Construct new player
+	 * @param name player name
+	 * @param type player's entity type
+	 */
+	Player(orxSTRING name, EntityType type);
 	virtual orxSTRING getName();
 
-	int amountOfPotionOwned(PotionType);
-	void changePotionAmount(PotionType, int);
+	/**
+	 * Gets how many potions of a given type the player
+	 * owns
+	 * @param type type of potion
+	 * @return number of owned potions of that type
+	 */
+	int amountOfPotionOwned(PotionType type);
 
-	bool ownsWeapon(WeaponType);
-	void setWeaponOwnership(WeaponType, bool);
+	/**
+	 * Alter the amount of a potion owned by the player
+	 * @param type relevant potion type
+	 * @param delta amount by which the owned amount should be changed
+	 */
+	void changePotionAmount(PotionType type, int delta);
 
-	void defeat(Enemy*);
+	/**
+	 * Get whether the player owns a given weapon
+	 * @param type relevant weapon type
+	 * @return whether the player owns that weapon
+	 */
+	bool ownsWeapon(WeaponType type);
 
-	void update(bool, bool, bool, bool, float);
+	/**
+	 * Set whether player owns a given weapon
+	 * @param type relevant weapon type
+	 * @param ownership whether the player owns the weapon
+	 */
+	void setWeaponOwnership(WeaponType type, bool ownership);
 
-	orxSTATUS read(orxSTRING);
+	/**
+	 * Defeat an enemy
+	 * @param e defeated enemy
+	 */
+	void defeat(Enemy* e);
+
+	/**
+	 * Update player
+	 * @param u up key pressed?
+	 * @param d down key pressed?
+	 * @param l left key pressed?
+	 * @param r right key pressed?
+	 * @param dt amount of time since last update
+	 */
+	void update(bool u, bool d, bool l, bool r, float dt);
+
+	/**
+	 * Read player data from disk
+	 * @param name player name
+	 * @return whether the read succeeded
+	 */
+	orxSTATUS read(orxSTRING name);
+
+	/**
+	 * Write player data to disk
+	 * @return whether the write succeeded
+	 */
 	orxSTATUS write();
+
+	virtual void resumeAnimation();
 };
 
 #endif

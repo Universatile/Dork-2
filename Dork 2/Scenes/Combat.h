@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 24/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -35,6 +35,10 @@ class Combat : public Scene {
 	Enemy* enemy;
 	orxVECTOR playerPos;
 
+	//scaling
+	static const orxVECTOR scaleUp;
+	static const orxVECTOR scaleNormal;
+
 	//combat mechanics and entity stats
 	int modifiers[3];
 	StatViewer* playerStats;
@@ -46,8 +50,8 @@ class Combat : public Scene {
 	int specialMoveCooldown = 0;
 
 	//potion related metadata
-	bool hasPotions = false;
-	bool isSelectingPotion = false;
+	orxBOOL hasPotions = false;
+	orxBOOL isSelectingPotion = false;
 	PotionType selectedPotion = QUICKHEAL_2;
 	int desiredQuantity = 1;
 
@@ -56,15 +60,42 @@ class Combat : public Scene {
 	orxOBJECT* potionName;
 	orxOBJECT* potionEffect;
 
-	//potion related functions
-	bool playerHasPotions();
+	/**
+	 * Whether the player has any potions to consume
+	 * @return whether the player owns any potions
+	 */
+	orxBOOL playerHasPotions();
+
+	/**
+	 * Consume selected potion
+	 */
 	void consumePotions();
-	void selectPotion(int);
+
+	/**
+	 * Change the potion selection
+	 * @param dir direction for potion switching (+1 for right, -1 for left)
+	 */
+	void selectPotion(int dir);
+
+	/**
+	 * Updates the potion data in the text
+	 * fields
+	 */
 	void updatePotionDescription();
 
-	SceneType makeMove(Move);
+	/**
+	 * Make the move selected by the player
+	 * @param move selected move
+	 * @return the next scene to show depending on the outcome of the action
+	 */
+	SceneType makeMove(Move move);
 public:
-	Combat(Player*, Enemy*);
+	/**
+	 * Construct new combat scene
+	 * @param player current player
+	 * @param enemy enemy to battle
+	 */
+	Combat(Player* player, Enemy* enemy);
 
 	virtual void activate();
 	virtual void deactivate();

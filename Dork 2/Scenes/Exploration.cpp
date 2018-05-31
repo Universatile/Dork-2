@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 24/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -22,39 +22,29 @@
 #include "Exploration.h"
 #include "Combat.h"
 
-Exploration::Exploration(Player* player, orxCAMERA* camera) : Scene(), camera(camera) {
+Exploration::Exploration(Player* player, orxCAMERA* camera) : Scene(), camera(camera), existingEnemies() {
 	loadPlayerData(player);
-	music = orxSound_CreateFromConfig("BackgroundMusic1");
+	resetMusic();
 	canSave = orxTRUE;
 
-	setPauseMenuPosition({-50, 0, 0});
+	setPauseMenuPosition(Scene::createVector(-50, 0, 0));
+	initializeUITextAt(Scene::createVector(-500, 160, -0.1));
 }
 
-void Exploration::resetWorld() {
-	orxU32 defaultGroupID = orxString_GetID(orxOBJECT_KZ_DEFAULT_GROUP);
-	for (
-		 orxOBJECT *obj = orxObject_GetNext(orxNULL, defaultGroupID);
-		 obj != orxNULL;
-		 obj = orxObject_GetNext(obj, defaultGroupID)
-		 ) {
-		orxSTRING name = (orxSTRING)orxObject_GetName(obj);
-		orxConfig_PushSection(name);
-		if (orxConfig_GetBool("IsEnemy")) {
-			Enemy* e = (Enemy*)orxObject_GetUserData(obj);
-			e->despawn();
-		}
-		orxConfig_PopSection();
+void Exploration::resetMusic() {
+	if (music != orxNULL) {
+		orxSound_Stop(music);
 	}
-	enemiesInExistence = 0;
+	music = orxSound_CreateFromConfig("BackgroundMusic1");
 }
 
-void Exploration::activate() {
-	nextSceneType = EXPLORATION;
-	Scene::activate();
-}
-
-void Exploration::deactivate() {
-	Scene::deactivate();
+void Exploration::resetWorld(Player* player) {
+	loadPlayerData(player);
+	resetMusic();
+	for (std::list<Enemy*>::iterator it = existingEnemies.begin(); it != existingEnemies.end(); it++) {
+		(*it)->despawn();
+	}
+	existingEnemies.clear();
 }
 
 void Exploration::spawnEnemy() {
@@ -77,55 +67,54 @@ void Exploration::spawnEnemy() {
 		orxObject_Pick(&pos, orxString_GetID("Colliders")) != orxNULL) {
 		return;
 	}
-	Enemy::createRandomEnemy(
-							 GOBLIN,//(EnemyType)orxMath_GetRandomU32(0, ENEMYCOUNT - 1),
-							 player->getLevel(),
-							 pos
+	Enemy* e = Enemy::createRandomEnemy(
+							 IMP,//(EnemyType)orxMath_GetRandomU32(0, ENEMYCOUNT - 1),
+							 player, pos
 							 );
-	enemiesInExistence++;
+	existingEnemies.push_back(e);
 }
 
 SceneType Exploration::update(const orxCLOCK_INFO* clockInfo) {
+	// was the game already in a state that would require pausing animations?
+	// (would imply that the game was paused or text was already present)
+	orxBOOL wasPseudoPaused = paused || Scene::currentlyHasText();
 	SceneType type = Scene::update(clockInfo);
 	if (type != EXPLORATION) {
 		return type;
 	}
-	if (paused) {
+	// if game is in a paused state, do nothing
+	if (paused || Scene::currentlyHasText()) {
+		// if game wasn't already in such a state, pause animations
+		if (!wasPseudoPaused) {
+			enableAnimation(orxFALSE);
+		}
 		return EXPLORATION;
+	} else if (wasPseudoPaused) {
+		// if game is no longer in a paused state but used to be,
+		// resume animations
+		enableAnimation(orxTRUE);
 	}
 	orxFLOAT delta = clockInfo->fDT;
-	orxU32 defaultGroupID = orxString_GetID(orxOBJECT_KZ_DEFAULT_GROUP);
-	for (
-		 orxOBJECT *obj = orxObject_GetNext(orxNULL, defaultGroupID);
-		 obj != orxNULL;
-		 obj = orxObject_GetNext(obj, defaultGroupID)
-		 ) {
-		orxSTRING name = (orxSTRING)orxObject_GetName(obj);
-		if (orxString_Compare(name, "Player") == 0) {
-			player->update(orxInput_IsActive("GoUp"),
-						   orxInput_IsActive("GoDown"),
-						   orxInput_IsActive("GoLeft"),
-						   orxInput_IsActive("GoRight"),
-						   delta);
-		} else {
-			orxConfig_PushSection(name);
-			if (orxConfig_GetBool("IsEnemy")) {
-				Enemy* e = (Enemy*)orxObject_GetUserData(obj);
-				orxVECTOR distance;
-				orxVECTOR ppos = player->getPosition();
-				orxVECTOR epos = e->getPosition();
-				orxVector_Sub(&distance, &ppos, &epos);
-				if (orxVector_GetSize(&distance) > 900) {
-					e->despawn();
-					enemiesInExistence--;
-				} else {
-					e->update(delta);
-				}
-			}
-			orxConfig_PopSection();
+	player->update(orxInput_IsActive("GoUp"),
+				   orxInput_IsActive("GoDown"),
+				   orxInput_IsActive("GoLeft"),
+				   orxInput_IsActive("GoRight"),
+				   delta);
+	orxVECTOR ppos = player->getPosition();
+	for (std::list<Enemy*>::iterator it = existingEnemies.begin(); it != existingEnemies.end();) {
+		Enemy* e = *it;
+		orxVECTOR epos = e->getPosition();
+		orxFLOAT distance = orxVector_GetDistance(&ppos, &epos);
+		if (distance > 900) {
+			existingEnemies.erase(it++);
+			e->despawn();
+			continue;
+		} else if (distance < 600) {
+			e->update(delta);
 		}
+		it++;
 	}
-	if (enemiesInExistence < 15) {
+	if (existingEnemies.size() < 15) {
 		timeSinceEnemySpawn += delta;
 		if (timeSinceEnemySpawn > 5) {
 			timeSinceEnemySpawn = 0;
@@ -133,7 +122,7 @@ SceneType Exploration::update(const orxCLOCK_INFO* clockInfo) {
 		}
 	}
 	//update camera position
-	orxVECTOR camPos = {0, 0, 0};
+	orxVECTOR camPos;
 	orxCamera_GetPosition(camera, &camPos);
 	camPos.fX = player->getPosition().fX;
 	camPos.fY = player->getPosition().fY;
@@ -170,8 +159,23 @@ orxSTATUS Exploration::EventHandler(const orxEVENT* currentEvent) {
 								if (isEnemy) {
 									Enemy* e = (Enemy*)orxObject_GetUserData(objs[i]);
 									nextScene = new Combat(player, e);
+
+									enableAnimation(orxFALSE);
+									player->pauseAnimation();
+									existingEnemies.remove(e);
+
 									nextSceneType = COMBAT;
-									enemiesInExistence--;
+									orxCHAR text[40];
+									orxString_Print(text, "%s encountered a(n) %s!",
+													player->getName(), e->getName());
+
+									orxVECTOR pos;
+									orxCamera_GetPosition(camera, &pos);
+									orxVector_Add(&pos, &pos, &UITextOffset);
+									moveUITextTo(pos);
+
+									loadUIText(text);
+
 									return orxSTATUS_SUCCESS;
 								}
 							}
@@ -199,6 +203,21 @@ orxSTATUS Exploration::EventHandler(const orxEVENT* currentEvent) {
 	}
 
 	return orxSTATUS_SUCCESS;
+}
+
+void Exploration::enableAnimation(orxBOOL enable) {
+	for (std::list<Enemy*>::iterator it = existingEnemies.begin(); it != existingEnemies.end(); it++) {
+		if (enable) {
+			(*it)->resumeAnimation();
+		} else {
+			(*it)->pauseAnimation();
+		}
+	}
+}
+
+void Exploration::activate() {
+	enableAnimation(orxTRUE);
+	Scene::activate();
 }
 
 SceneType Exploration::getSceneType() {

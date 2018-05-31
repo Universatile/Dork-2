@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 20/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -63,6 +63,8 @@ enum SceneType {
 	ARMORY
 };
 
+// for use in combat
+// represents player choice from UI
 enum Move {
 	ATTACK,
 	SPECIAL_MOVE,

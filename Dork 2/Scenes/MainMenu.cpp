@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 03/12/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -27,16 +27,16 @@ void MainMenu::activate() {
 	cursorPos = 0;
 	orxKeyboard_ClearBuffer();
 
-	orxVECTOR pos = {-1216, 1592, 0};
-	orxObject_SetTextString(nameField, "Name:");
+	orxVECTOR pos = Scene::createVector(-1216, 1592, 0);
+	orxObject_SetTextString(nameField, "Type your alphanumeric name");
 	orxObject_SetPosition(nameField, &pos);
 
-	pos = {-1216, 1652, 0};
+	pos = Scene::createVector(-1125, 1652, 0);
 	orxObject_SetTextString(typeField, Entity::typeToString(chosenType));
 	orxObject_SetPosition(typeField, &pos);
 
 	//reset selector
-	pos = {-1100, 1600, 0};
+	pos = Scene::createVector(-1250, 1600, 0);
 	orxObject_SetPosition(selector, &pos);
 	currentSelection = 0;
 
@@ -46,8 +46,8 @@ void MainMenu::activate() {
 MainMenu::MainMenu() {
 	nameField = orxObject_CreateFromConfig("SV");
 	typeField = orxObject_CreateFromConfig("SV");
-	selector = orxObject_CreateFromConfig("MMSelector");
-	lrArrows = orxObject_CreateFromConfig("MMArrows");
+	selector = orxObject_CreateFromConfig("Selector");
+	lrArrows = orxObject_CreateFromConfig("LRArrows");
 	orxObject_CreateFromConfig("MMObjects");
 }
 
@@ -82,28 +82,55 @@ SceneType MainMenu::update(const orxCLOCK_INFO* clockInfo) {
 	}
 	orxVECTOR pos;
 	orxObject_GetPosition(selector, &pos);
-	if (getKeyDown((orxSTRING)"GoDown") && currentSelection < 3) {
-		currentSelection++;
-		pos.fY += 60;
-	} else if (getKeyDown((orxSTRING)"GoUp") && currentSelection > 0) {
-		currentSelection--;
-		pos.fY -= 60;
-	} else if (getKeyDown((orxSTRING)"GoLeft") && chosenType > 0 && currentSelection == 1) {
-		chosenType = (EntityType)(chosenType - 1);
-		orxObject_SetTextString(typeField, Entity::typeToString(chosenType));
-	} else if (getKeyDown((orxSTRING)"GoRight") && chosenType < NOTYPE - 1 && currentSelection == 1) {
-		chosenType = (EntityType)(chosenType + 1);
-		orxObject_SetTextString(typeField, Entity::typeToString(chosenType));
-	} else if (getKeyDown((orxSTRING)"Enter")) {
-		player = new Player(name, chosenType);
-		if (currentSelection == 3) {
-			if (player->read(name) != orxSTATUS_SUCCESS) {
-				return MAIN_MENU;
-			}
+	int prevSelection = currentSelection;
+	EntityType prevType = chosenType;
+	if (getKeyDown((orxSTRING)"GoDown")) {
+		if (currentSelection < 3) {
+			currentSelection++;
+			pos.fY += 60;
+		} else {
+			orxObject_AddSound(selector, "ErrorSound");
 		}
-		return EXPLORATION;
+	} else if (getKeyDown((orxSTRING)"GoUp")) {
+		if (currentSelection > 0) {
+			currentSelection--;
+			pos.fY -= 60;
+		} else {
+			orxObject_AddSound(selector, "ErrorSound");
+		}
+	} else if (getKeyDown((orxSTRING)"GoLeft") && currentSelection == 1) {
+		if (chosenType > 0) {
+			chosenType = (EntityType)(chosenType - 1);
+		} else {
+			orxObject_AddSound(selector, "ErrorSound");
+		}
+	} else if (getKeyDown((orxSTRING)"GoRight") && currentSelection == 1) {
+		if (chosenType < NOTYPE - 1) {
+			chosenType = (EntityType)(chosenType + 1);
+		} else {
+			orxObject_AddSound(selector, "ErrorSound");
+		}
+	} else if (getKeyDown((orxSTRING)"Enter")) {
+		if (cursorPos > 0 && currentSelection >= 2) {
+			player = new Player(name, chosenType);
+			if (currentSelection == 3) {
+				if (player->read(name) != orxSTATUS_SUCCESS) {
+					orxObject_AddSound(selector, "ErrorSound");
+					return MAIN_MENU;
+				}
+			}
+			return EXPLORATION;
+		} else {
+			orxObject_AddSound(selector, "ErrorSound");
+		}
 	}
-	orxObject_SetPosition(selector, &pos);
+	if (currentSelection != prevSelection) {
+		orxObject_SetPosition(selector, &pos);
+		orxObject_AddSound(selector, "SelectorSound");
+	} else if (chosenType != prevType) {
+		orxObject_AddSound(selector, "TickSound");
+		orxObject_SetTextString(typeField, Entity::typeToString(chosenType));
+	}
 	orxObject_Enable(lrArrows, currentSelection == 1);
 	return MAIN_MENU;
 }

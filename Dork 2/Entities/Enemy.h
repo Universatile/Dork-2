@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 20/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@
 
 #include "Entity.h"
 
+class Player;
+class Scene;
+
 #define ENEMYCOUNT 7
 enum EnemyType {
 	GOBLIN,
@@ -36,29 +39,83 @@ enum EnemyType {
 };
 
 class Enemy : public Entity {
-	static const int healthBounds[8];
-	static const int speeds[8];
-	static const int strengthBounds[8];
-	static const int defenseBounds[8];
-	static const int rewardBounds[8];
+	// constants for generating random enemies
+	static const float healthBounds[8];
+	static const float speeds[8];
+	static const float strengthBounds[8];
+	static const float defenseBounds[8];
+	static const float rewardBounds[8];
 	static const WeaponType preferredWeapons[8];
-	EnemyType type;
 
+	EnemyType enemyType;
+
+	/**
+	 * Create a random stat
+	 * @param base base value for stat
+	 * @param scale maximum amount by which the stat could be scaled up from the base
+	 * @return random stat based on and scaled from the base stat
+	 */
+	static int randomStat(int base, float scale);
+
+	// movement and animation data
+	orxVECTOR prevPosition;
 	orxVECTOR direction;
+	orxCHAR animation[40];
 	orxFLOAT distanceTravelled = 0;
+	orxFLOAT lastDt = 0;
 public:
-	static orxSTRING typeToString(EnemyType);
-	static EntityType entityTypeForEnemy(EnemyType);
-	static Enemy* createRandomEnemy(EnemyType, double, orxVECTOR);
+	/**
+	 * Get enemy name
+	 * @param type type of relevant enemy
+	 * @return human readable name for enemy
+	 */
+	static orxSTRING typeToString(EnemyType type);
 
-	Enemy(EnemyType, int, int, int, int, Weapon*, int, double, orxVECTOR);
+	/**
+	 * Get the entity type associated with an enemy
+	 * @param type the type of enemy
+	 * @return the associated entity type
+	 */
+	static EntityType entityTypeForEnemy(EnemyType type);
+
+	/**
+	 * Creates a random enemy
+	 * @param type desired enemy type
+	 * @param player the current player
+	 * @param pos the spawn position of the enemy
+	 * @return pointer to the newly spawned enemy
+	 */
+	static Enemy* createRandomEnemy(EnemyType type, Player* player, orxVECTOR pos);
+
+	/**
+	 * Construct new enemy
+	 * @param type type of enemy
+	 * @param HP enemy's HP on spawn
+	 * @param speed enemy's speed stat on spawn
+	 * @param str enemy's strength stat on spawn
+	 * @param def enemy's defense stat on spawn
+	 * @param w weapon with which enemy spawns
+	 * @param gold gold carried by enemy
+	 * @param lv enemy's level
+	 * @param pos enemy's spawn position
+	 */
+	Enemy(EnemyType type, int HP, int speed, int str, int def, Weapon* w, int gold, Level lv, orxVECTOR pos);
 
 	virtual orxSTRING getName();
-	EnemyType getType();
-	EntityType getEntityType();
+	EnemyType getEnemyType();
 
-	void update(float);
+	/**
+	 * Update enemy
+	 * @param dt amount of time passed since last update
+	 */
+	void update(float dt);
+
+	/**
+	 * Randomly choose a new direction for the enemy to travel in
+	 */
 	void newRandomDirection();
+
+	virtual void resumeAnimation();
 };
 
 #endif

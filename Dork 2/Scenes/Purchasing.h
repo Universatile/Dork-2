@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 01/12/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -25,24 +25,41 @@
 #include "Scene.h"
 #include "StatViewer.h"
 
+// return values for makePurchase()
 #define PURCHASE_SUCCESSFUL 0
 #define PURCHASE_FAILED 1
 
 class Purchasing : public Scene {
 protected:
+	// player selection
 	int currentSelection = 0;
+	int prevSel = 0;
 	int selectionLimit;
-	orxOBJECT* selectorArrow;
-	orxVECTOR defaultPos;
+	orxBOOL exitSelected = orxFALSE;
+	std::vector<orxOBJECT*> items;
 
+	// UI
+	orxOBJECT* itemSelector;
+	orxOBJECT* exitArrow;
+
+	/**
+	 * Purchase the selected item
+	 * @return the result of the purchase attempt
+	 */
 	virtual int makePurchase() = 0;
-	virtual void loadItemData() = 0;
+
+	/**
+	 * Loads the stats of the selected item
+	 * and updates UI accordingly
+	 */
+	virtual void loadItemData();
 
 	StatViewer* statViewer = orxNULL;
 
 	Purchasing();
 public:
 	virtual void activate();
+	virtual void loadPlayerData(Player*);
 
 	virtual SceneType update(const orxCLOCK_INFO*);
 };

@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 03/12/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -22,6 +22,15 @@
 #include "Scene.h"
 
 orxBOOL Scene::playMusic = orxTRUE;
+const orxVECTOR Scene::textMargin = Scene::createVector(10, 10, 0);
+
+orxVECTOR Scene::createVector(orxFLOAT x, orxFLOAT y, orxFLOAT z) {
+	orxVECTOR vector;
+	vector.fX = x;
+	vector.fY = y;
+	vector.fZ = z;
+	return vector;
+}
 
 Scene::Scene() {
 	pauseSelector = orxObject_CreateFromConfig("Selector");
@@ -29,6 +38,11 @@ Scene::Scene() {
 
 	pauseMenu = orxObject_CreateFromConfig("PauseMenu");
 	orxObject_Enable(pauseMenu, orxFALSE);
+}
+
+void Scene::destroy() {
+	orxObject_SetLifeTime(pauseMenu, 0);
+	orxObject_SetLifeTime(pauseSelector, 0);
 }
 
 void Scene::setPauseMenuPosition(orxVECTOR pos) {
@@ -73,6 +87,7 @@ void Scene::toggleMusic() {
 }
 
 void Scene::activate() {
+	nextSceneType = getSceneType();
 	if (Scene::playMusic && music != orxNULL) {
 		orxSound_Play(music);
 	}
@@ -84,6 +99,39 @@ void Scene::deactivate() {
 	}
 }
 
+void Scene::loadUIText(orxSTRING text) {
+	hasText = orxTRUE;
+	orxObject_SetTextString(uiTextObject, text);
+	orxObject_Enable(uiTextObject, orxTRUE);
+	orxObject_Enable(uiTextSprite, orxTRUE);
+}
+
+void Scene::dismissUIText() {
+	hasText = orxFALSE;
+	orxObject_Enable(uiTextObject, orxFALSE);
+	orxObject_Enable(uiTextSprite, orxFALSE);
+}
+
+void Scene::initializeUITextAt(orxVECTOR pos) {
+	uiTextObject = orxObject_CreateFromConfig("UIText");
+	uiTextSprite = orxObject_CreateFromConfig("UITextSprite");
+
+	moveUITextTo(pos);
+
+	orxObject_Enable(uiTextObject, orxFALSE);
+	orxObject_Enable(uiTextSprite, orxFALSE);
+}
+
+void Scene::moveUITextTo(orxVECTOR pos) {
+	orxObject_SetPosition(uiTextSprite, &pos);
+	orxVector_Add(&pos, &pos, &textMargin);
+	orxObject_SetPosition(uiTextObject, &pos);
+}
+
+orxBOOL Scene::currentlyHasText() {
+	return hasText;
+}
+
 SceneType Scene::update(const orxCLOCK_INFO* clockInfo) {
 	if (getKeyDown((orxSTRING)"Pause")) {
 		paused = !paused;
@@ -93,6 +141,7 @@ SceneType Scene::update(const orxCLOCK_INFO* clockInfo) {
 	if (paused) {
 		orxVECTOR pos;
 		orxObject_GetPosition(pauseSelector, &pos);
+		int prevSelection = pauseMenuSelection;
 		if (getKeyDown((orxSTRING)"GoDown") && pauseMenuSelection < PAUSE_MENU_ITEM_COUNT) {
 			pauseMenuSelection++;
 			pos.fY += 60;
@@ -129,9 +178,6 @@ SceneType Scene::update(const orxCLOCK_INFO* clockInfo) {
 
 					//return to main menu if necessary
 					if (selected == PAUSE_EXIT) {
-						if (music != orxNULL) {
-							orxSound_Stop(music);
-						}
 						return MAIN_MENU;
 					}
 				}
@@ -140,7 +186,14 @@ SceneType Scene::update(const orxCLOCK_INFO* clockInfo) {
 					break;
 			}
 		}
-		orxObject_SetPosition(pauseSelector, &pos);
+		if (pauseMenuSelection != prevSelection) {
+			orxObject_SetPosition(pauseSelector, &pos);
+			orxObject_AddSound(pauseSelector, "SelectorSound");
+		}
+	} else if (hasText) {
+		if (Scene::getKeyDown((orxSTRING)"Enter")) {
+			dismissUIText();
+		}
 	}
 	return getSceneType();
 }

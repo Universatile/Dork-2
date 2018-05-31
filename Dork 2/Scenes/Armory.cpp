@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 26/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -22,32 +22,32 @@
 #include "Armory.h"
 
 Armory::Armory(Player* player) : Purchasing() {
-	selectorArrow = orxObject_CreateFromConfig("Selector");
-	defaultPos = {-1300, 750, 0};
-	orxObject_SetPosition(selectorArrow, &defaultPos);
+	orxVECTOR pos = Scene::createVector(-1200, 1060, 0);
+	orxObject_SetPosition(itemSelector, &pos);
+
 	orxObject_CreateFromConfig("ArmoryHelp");
 
-	tickMarks = std::vector<orxOBJECT*>(WEAPONCOUNT);
-	orxVECTOR pos = {-1100, 750, 0};
-	orxVECTOR wpos = {-1200, 750, 0};
+	tickMark = orxObject_CreateFromConfig("TickMark");
+	orxObject_SetPosition(tickMark, &pos);
+
+	items = std::vector<orxOBJECT*>(WEAPONCOUNT);
 	for (int i = 0; i < WEAPONCOUNT; i++) {
-		orxOBJECT* tick = orxObject_CreateFromConfig("TickMark");
-		orxObject_SetPosition(tick, &pos);
-		tickMarks[i] = tick;
-
 		orxOBJECT* weapon = orxObject_CreateFromConfig(Weapon::getWeaponName((WeaponType)i));
-		orxObject_SetPosition(weapon, &wpos);
-
-		pos.fY += 60;
-		wpos.fY += 60;
+		items[i] = weapon;
+		orxObject_SetPosition(weapon, &pos);
+		orxObject_Enable(weapon, orxFALSE);
 	}
 
+	pos.fY += 70;
 	orxOBJECT* exit = orxObject_CreateFromConfig("Exit");
-	orxObject_SetPosition(exit, &wpos);
+	orxObject_SetPosition(exit, &pos);
+
+	pos.fX -= 58;
+	orxObject_SetPosition(exitArrow, &pos);
 
 	loadPlayerData(player);
 
-	pos = {-950, 750, 0};
+	pos = Scene::createVector(-1240, 850, 0);
 	weaponName = orxObject_CreateFromConfig("SV");
 	orxObject_SetPosition(weaponName, &pos);
 
@@ -71,44 +71,30 @@ Armory::Armory(Player* player) : Purchasing() {
 	weaponSpeed = orxObject_CreateFromConfig("SV");
 	orxObject_SetPosition(weaponSpeed, &pos);
 
-	statViewer = new StatViewer(player, {-1590, 1000, 0});
-	selectionLimit = WEAPONCOUNT;
+	statViewer = new StatViewer(player, Scene::createVector(-1590, 1000, 0));
+	selectionLimit = WEAPONCOUNT - 1;
 
-	setPauseMenuPosition({-1150, 1000, 0});
+	setPauseMenuPosition(Scene::createVector(-1150, 1000, 0));
+	initializeUITextAt(Scene::createVector(-1600, 1160, -0.1));
 }
 
 void Armory::loadPlayerData(Player* player) {
-	Scene::loadPlayerData(player);
-	for (int i = 0; i < WEAPONCOUNT; i++) {
-		orxObject_Enable(tickMarks[i], player->ownsWeapon((WeaponType)i));
-	}
+	Purchasing::loadPlayerData(player);
+	orxObject_Enable(tickMark, player->ownsWeapon(SWORD));
 	WeaponType type = player->getWeapon()->getWeaponType();
 	equipWeapon(type);
-	if (statViewer != orxNULL) {
-		statViewer->loadEntity(player);
-	}
 }
 
 void Armory::equipWeapon(WeaponType type) {
-	orxVECTOR pos;
-	if (lastEquipped >= 0 && lastEquipped != NOWEAPON) {
-		orxObject_GetPosition(tickMarks[lastEquipped], &pos);
-		pos.fX = -1100;
-		orxObject_SetPosition(tickMarks[lastEquipped], &pos);
-	}
 	lastEquipped = (int)type;
-	if (type != NOWEAPON) {
-		orxObject_GetPosition(tickMarks[lastEquipped], &pos);
-		pos.fX = -1050;
-		orxObject_SetPosition(tickMarks[lastEquipped], &pos);
-	}
+	orxObject_Enable(tickMark, type == currentSelection);
 }
 
 void Armory::loadItemData() {
 	Weapon* w = Weapon::allWeapons[currentSelection];
 	orxCHAR text[30];
 
-	orxString_Print(text, "Weapon: %s", w->getName());
+	orxString_Print(text, "Weapon: %s%s", w->getName(), (lastEquipped == currentSelection ? " (Equipped)" : ""));
 	orxObject_SetTextString(weaponName, text);
 
 	orxString_Print(text, "Type: %s", Entity::typeToString(w->getType()));
@@ -126,24 +112,41 @@ void Armory::loadItemData() {
 	double spd = w->getSpeedMod();
 	orxString_Print(text, "Speed: %s%d%%", (spd < 0 ? "-" : "+"), (int)abs(spd * 100));
 	orxObject_SetTextString(weaponSpeed, text);
+
+	orxObject_Enable(tickMark, player->ownsWeapon((WeaponType)currentSelection));
+
+	Purchasing::loadItemData();
 }
 
 int Armory::makePurchase() {
 	Weapon* weapon = Weapon::copyOf((WeaponType)currentSelection);
 	WeaponType type = (WeaponType)currentSelection;
 	if (player->ownsWeapon((WeaponType)currentSelection)) {
+		if (player->getWeapon()->getWeaponType() == type) {
+			type = NOWEAPON;
+		}
 		equipWeapon(type);
 		player->equipWeapon(Weapon::copyOf(type));
 		statViewer->reloadData();
-		return WEAPON_EQUIPPPED;
+
+		orxCHAR text[40];
+		orxString_Print(text, "%squipped %s", (type == NOWEAPON ? "Un-e" : "E"), weapon->getName());
+		loadUIText(text);
+
+		return type == NOWEAPON ? WEAPON_UNEQUIPPED : WEAPON_EQUIPPED;
 	} else if (player->getGold() >= weapon->getPrice()) {
 		player->transaction(-weapon->getPrice());
 		player->setWeaponOwnership((WeaponType)currentSelection, true);
-		orxObject_Enable(tickMarks[currentSelection], orxTRUE);
+		orxObject_Enable(tickMark, orxTRUE);
 
 		equipWeapon(type);
 		player->equipWeapon(Weapon::copyOf(type));
 		statViewer->reloadData();
+
+		orxCHAR text[40];
+		orxString_Print(text, "Purchased %s", weapon->getName());
+		loadUIText(text);
+
 		return PURCHASE_SUCCESSFUL;
 	}
 	return PURCHASE_FAILED;

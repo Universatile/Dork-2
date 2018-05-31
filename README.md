@@ -6,15 +6,15 @@ In the late 70s and early 80s, Zork was a popular text-based adventure game. Dor
 Now, Dork is back as a 2D game!
 
 ### Controls
-On the main menu, use the arrow keys to move the selector or change a value. WASD will also work unless the "name" field is selected. Press ENTER to select buttons. In game, use WASD or the arrow keys to move around or select things. Press ESC to pause so you can save, toggle music, or exit to main.
+On the main menu, use the arrow keys to move the selector or change a value. WASD will also work unless the "name" field is selected. Press ENTER to select buttons. In game, use WASD or the arrow keys to move around or select things. Press ESC to to access the pause menu.
 
-In the shop, press LEFT and RIGHT (or A and D) to change the number of potions you want to purchase.
+In the shop, press the left and right brackets (`[` and `]`) to change the number of potions you want to purchase.
 
-During combat, you can use potions if you have any on you. Press LEFT and RIGHT (or A and D) to change potion and UP and DOWN (or W and S) to change the number of potions you want to consume together.
+During combat, you can use potions if you have any on you. Press LEFT and RIGHT (or A and D) to select the potion and the left and right brackets to change the number of potions you want to consume.
 
 ### About
 
-Dork 2 was created for [Maximum Monster Month](https://itch.io/jam/maximum-monster-month), a Game Jam hosted on [itch.io](https://itch.io).
+Dork 2 was created for [Maximum Monster Month](https://itch.io/jam/maximum-monster-month), a Game Jam hosted on [itch.io](https://itch.io). Although the game was not completed on time and ideas for the game existed before joining the jam, the jam was a necessary incentive to begin development, which continues long after the duration of the jam.
 
 ### Legal
 
@@ -23,3 +23,21 @@ Project available under GPLv3. The source code for the original Dork is currentl
 Orx game engine available under Zlib license (see [the repository](https://github.com/orx/orx) for details).
 
 Assets used in the game are available under Creative Commons licenses. See CREDITS for more details.
+
+### Contributing/Community
+
+Contributions to the development of Dork 2 are more than welcome! If you would like to contribute assets (music, sprites) or want to improve the codebase, feel free to fork the repository and make a pull request!
+
+If you have any suggestions as to how to improve the game, you can [open a new issue](
+https://github.com/Arc676/Dork-2/issues/new).
+
+We also have a [Discord server](
+https://discord.gg/3e4gxBx) if you want to chat about the game! If you don't have a GitHub account, you can also report bugs and make suggestions here.
+
+### Compiling Dork 2 from Source
+
+If you would like to compile Dork 2 from source so you can check out development progress or you wish to make modifications, use `git clone` or GitHub's interface to download the source code and the included resources for compilation. The repository includes simple methods for compilation on any platform.
+- On Mac, use the associated Xcode project to compile the executable. Note that the output program is a simple executable file rather than an app package (.app) like normal applications.
+- On Linux, use `make` and the included `Makefile` to compile Dork 2. The executable is compiled to `Build/Dork 2` relative to the root of the repository. Unless you move `lib/liborx.so` to a location for custom libraries, you will need to update your library path to include `lib/`, as the executable requires the dynamically linked Orx library. You can do this by running `export LD_LIBRARY_PATH=$(readlink -f lib)` when in the root of the repository (or using a relative path in place of `lib`). Once the library is in your library path, you will be able to run the executable file. Note that the game assets must be in the same directory as the executable file. This is done automatically by the `Makefile`, but if you wish to move the executable (or make it accessible from elsewhere) you will need to move all the assets as well or create an alias that includes an absolute path to the executable file.
+- On Windows, you can compile Dork 2 with Visual Studio using the included VS project. Note that the output EXE must be in the same directory as the game assets.
+Please note that, during development, these compilation methods may diverge. Certain project files may become outdated if new assets are added while working on another platform (e.g. if I'm working on Linux and a new asset is added, neither the Xcode nor Visual Studio projects will include references to said asset until I'm on their respective platforms).

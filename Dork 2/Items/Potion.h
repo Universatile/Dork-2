@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 20/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "Enums.h"
 
 class Potion {
+	// static instances of each potion
 	static Potion* quickheal2;
 	static Potion* quickheal5;
 	static Potion* quickheal10;
@@ -38,26 +39,53 @@ class Potion {
 	static Potion* defboost;
 	static Potion* speedboost;
 
-	static orxSTRING typeToString(PotionType);
+	/**
+	 * Obtains the name of a potion
+	 * @param type relevant potion type
+	 * @return Human readable potion name
+	 */
+	static orxSTRING typeToString(PotionType type);
 
+	// potion data
 	int price;
 	PotionType type;
 	double amount;
 
+	/**
+	 * Copy a potion
+	 * @return a new Potion pointer with the same properties
+	 */
 	Potion* copy();
 public:
+	// all the potions
 	static std::vector<Potion*> allPotions;
 	
-	Potion(PotionType, double, int);
+	/**
+	 * Construct a new potion
+	 * @param type potion type
+	 * @param effect amount by which the relevant stat is improved
+	 * @param price potion price
+	 */
+	Potion(PotionType type, double effect, int price);
 
 	int getPrice();
 	double getAmount();
 	PotionType getType();
 	orxSTRING getName();
 
-	static orxSTRING configCodeForType(PotionType);
+	/**
+	 * Get the abbreviation used in config for a given potion type
+	 * @param type relevant potion type
+	 * @return abbreviation used to represent potion in config files
+	 */
+	static orxSTRING configCodeForType(PotionType type);
 
-	static Potion* getCopyOf(PotionType);
+	/**
+	 * Get a copy of a given potion
+	 * @param type desired potion type
+	 * @return a copy of the desired potion
+	 */
+	static Potion* getCopyOf(PotionType type);
 };
 
 #endif

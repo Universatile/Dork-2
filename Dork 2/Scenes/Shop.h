@@ -4,7 +4,7 @@
 //
 //  Created by Alessandro Vinciguerra on 24/11/2017.
 //      <alesvinciguerra@gmail.com>
-//Copyright (C) 2017 Arc676/Alessandro Vinciguerra
+//Copyright (C) 2017-8 Arc676/Alessandro Vinciguerra
 
 //This program is free software: you can redistribute it and/or modify
 //it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 
 class Shop : public Purchasing {
 	int quantity = 1;
-	std::vector<orxOBJECT*> potionCounts;
 
+	// text fields
 	orxOBJECT* potionName;
 	orxOBJECT* potionPrice;
 	orxOBJECT* potionEffect;
@@ -36,9 +36,12 @@ protected:
 	virtual int makePurchase();
 	virtual void loadItemData();
 public:
-	Shop(Player*);
+	/**
+	 * Construct new Shop scene
+	 * @param player current player
+	 */
+	Shop(Player* player);
 
-	virtual void loadPlayerData(Player*);
 	virtual SceneType getSceneType();
 	virtual SceneType update(const orxCLOCK_INFO*);
 };
